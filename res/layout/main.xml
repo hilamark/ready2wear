@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) 2014-present, Facebook, Inc. All rights reserved.
+
+    You are hereby granted a non-exclusive, worldwide, royalty-free license to use,
+    copy, modify, and distribute this software in source code or binary form for use
+    in connection with the web services and APIs provided by Facebook.
+
+    As with any software that integrates with the Facebook platform, your use of
+    this software is subject to the Facebook Developer Principles and Policies
+    [http://developers.facebook.com/policy/]. This copyright notice shall be
+    included in all copies or substantial portions of the software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+    FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+    COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+    IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:facebook="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:background="#FFF"
+        >
+        
+   
+
+    <LinearLayout android:orientation="vertical"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
+                  android:background="#FFF"
+                  android:id="@+id/main_ui_container">
+                  
+         <ImageView
+        android:id="@+id/rtwLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="170dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/readytowear" />
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/fbLoginButon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            facebook:com_facebook_confirm_logout="false"
+            facebook:com_facebook_tooltip_mode="never_display" />
+
+        <LinearLayout
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+            >
+            <TextView
+                    android:id="@+id/greeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_gravity="center"
+                    android:textColor="#333"
+                    android:textSize="18sp"/>
+            <com.facebook.login.widget.ProfilePictureView
+                    android:id="@+id/profilePicture"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:layout_marginBottom="10dp"
+                    facebook:com_facebook_preset_size="normal"/>
+           </LinearLayout>
+
+            <TextView
+                android:id="@+id/moreDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_horizontal"
+                android:lines="2"
+                android:text="Few more details and you&apos;re READY TO WEAR!"
+                android:textColor="#333"
+                android:textSize="18sp" />
+            
+            <TableLayout android:layout_width="match_parent"
+                 android:layout_height="wrap_content">
+        		<TableRow>
+            		<TextView android:layout_width="wrap_content"
+            		  android:id="@+id/userAdress"
+                      android:layout_height="wrap_content"
+                      android:text="@string/userAdressLabel"/>
+
+           			 <EditText android:id="@+id/userAdressEditText"
+           			     android:inputType="textPostalAddress"
+                      android:layout_height="wrap_content"
+                      android:layout_width="wrap_content"
+                      android:layout_weight="1"/>
+        		</TableRow>
+        		
+        		<TableRow>
+            		<TextView android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:id="@+id/userPhoneNumLabel"
+                      android:text="@string/userPhoneNumLabel"/>
+
+           			 <EditText android:id="@+id/userPhoneEditText"
+                      android:layout_height="wrap_content"
+                      android:inputType="phone"
+                      android:layout_width="wrap_content"
+                      android:layout_weight="1"/>
+        		</TableRow>
+        		 </TableLayout>
+        		  <TableLayout android:layout_width="match_parent"
+                 android:layout_height="wrap_content">
+        		<TableRow >
+        		     <Button android:id="@+id/removeUserButton"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_marginTop="5dp"
+            	android:text="DEBUG Remove"
+            	android:layout_gravity="left"/>
+        		     
+        		    <Button android:id="@+id/userDetailsSubmit"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_marginTop="5dp"
+            	android:text="Submit"
+            	android:layout_gravity="center_horizontal"/>
+        		</TableRow>
+        </TableLayout>
+
+            
+    </LinearLayout>
+
+    
+   
+</ScrollView>
+
