@@ -16,7 +16,7 @@
     FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
     COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
     IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -->
 
 <resources>
@@ -42,5 +42,15 @@
     <string name="userPhoneNumLabel">Phone : </string>
     <string name="title_activity_sample_items">SampleItems</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_itemview_list">ItemsView</string>
+    <string name="title_itemview_detail">ItemView Detail</string>
+    <string name="title_activity_add_items">AddItems</string>
+    <string name="title_activity_add_item_fragment">AddItemFragment</string>
+    
+   <string name="cancel">Cancel</string>
+   <string name="done">Done</string>
+   <string name="itemSizeLabel">Size : </string>
+   <string name="itemPrice1dLabel">Price per day : </string>
+   <string name="selectLabel">Select Size</string>
 
 </resources>

@@ -20,10 +20,15 @@
 
 package com.ready2wear.main;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -45,18 +50,18 @@ import com.parse.Parse;
 import com.ready2wear.domain.SessionData;
 import com.ready2wear.domain.User;
 import com.ready2wear.management.UsersManagment;
+import com.ready2wear.views.AddItems;
+import com.ready2wear.views.ItemViewListActivity;
 
 public class LoginScreen extends FragmentActivity {
 
 	private static final String TAG = "LoginScreen";
-    private final String PENDING_ACTION_BUNDLE_KEY =
-            "com.example.hellofacebook:PendingAction";
 
     private ProfilePictureView profilePictureView;
     private TextView greeting;
     private CallbackManager callbackManager;
     private ProfileTracker profileTracker;
-    private Button mSave;
+    private Button mSubmit;
     private TextView mDetailsTitle;
     private EditText mUserAdress;
     private EditText mUserPhone;
@@ -64,6 +69,7 @@ public class LoginScreen extends FragmentActivity {
     private TextView mUserPhoneLabel;
     private LoginButton mFBLogin;
     private Button mRemoveDB;
+    private Button mAddItems;
     
     private Profile currentProfile;
     
@@ -97,46 +103,67 @@ public class LoginScreen extends FragmentActivity {
                     }
                 });
 
-        if (savedInstanceState != null) {
-            String name = savedInstanceState.getString(PENDING_ACTION_BUNDLE_KEY);
-        }
-
         setContentView(R.layout.main);
         
         mFBLogin = (LoginButton) findViewById(R.id.fbLoginButon);
-      //  mFBLogin.setReadPermissions(Arrays.asList("user_status",
-      //  					"public_profile", "user_birthday", "user_friends")); 
+        mFBLogin.setReadPermissions(Arrays.asList("user_status",
+        					"public_profile", "user_birthday", "user_friends")); 
 		mFBLogin.setLoginBehavior(LoginBehavior.WEB_ONLY);
         
         // Hide details 
         mDetailsTitle = (TextView)findViewById(R.id.moreDetail);
-        mDetailsTitle.setVisibility(View.INVISIBLE);
         mUserAdress =  (EditText) findViewById(R.id.userAdressEditText);
-        mUserAdress.setVisibility(View.INVISIBLE);
         mUserPhone = (EditText) findViewById(R.id.userPhoneEditText);
-        mUserPhone.setVisibility(View.INVISIBLE);
         
         mUserAdressLabel = (TextView) findViewById(R.id.userAdress);
-        mUserAdressLabel.setVisibility(View.INVISIBLE);
         mUserPhoneLabel = (TextView) findViewById(R.id.userPhoneNumLabel);
-        mUserPhoneLabel.setVisibility(View.INVISIBLE);
         
-        mSave = (Button) findViewById(R.id.userDetailsSubmit);
-        mSave.setVisibility(View.INVISIBLE);
-        mSave.setBackgroundColor(Color.BLACK);
-        mSave.setTextColor(Color.WHITE);
+        mSubmit = (Button) findViewById(R.id.userDetailsSubmit);
+        mSubmit.setBackgroundColor(Color.BLACK);
+        mSubmit.setTextColor(Color.WHITE);
+        cleanDetailsEditView();
         
-        mSave.setOnClickListener(new View.OnClickListener() {
+        mSubmit.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	Log.d(TAG, "Submit button pressed");
+            	
+            	// Get details
+            	String address = mUserAdress.getText().toString();
+            	String phone = mUserPhone.getText().toString();
+            	
+            	// Regular expression pattern to test input
+                Pattern pattern = Pattern.compile("(.)*(\\d)(.)*");
+                
+                /* find the addresses  by using getFromLocationName() method with the given address*/
+                List<Address> foundGeocode = null;
+                try {
+					foundGeocode = new Geocoder(LoginScreen.this).getFromLocationName(address + ", Tel Aviv, Israel", 1);
+				} catch (IOException e) {
+				}
+
+            	// Verify address
+            	if (foundGeocode == null || foundGeocode.size() == 0){
+            		Toast.makeText(LoginScreen.this, "ERROR! You've entered empty / illegal address", Toast.LENGTH_SHORT).show();
+            		return;
+            	}
+            	
+            	// Verify phone (not empty, starts with 0, includes olny digits, and is at least 8 digits)
+            	if (phone.isEmpty() || !phone.startsWith("0") || !phone.matches("[0-9]+") || phone.length() < 8){
+            		Toast.makeText(LoginScreen.this, "ERROR! You've entered empty / illegal phone nember", Toast.LENGTH_SHORT).show();
+            		return;
+            	}
+            		
+            	// Save data
             	User currUser = SessionData.getInstance().getCurrentUser();
-            	currUser.setAdress(mUserAdress.getText().toString());
-            	currUser.setPhoneNumber(mUserPhone.getText().toString());
+            	currUser.setAdress(address);
+            	currUser.setPhoneNumber(phone);
             	
             	UsersManagment.saveUser(currUser);
             	
             	// Change view
-            	updateUI();
+            	//updateUI();
+            	 Intent i = new Intent(LoginScreen.this, AddItems.class);
+                 startActivityForResult(i, 1);
             }
         });
         
@@ -149,6 +176,15 @@ public class LoginScreen extends FragmentActivity {
             	
             	UsersManagment.removeUser(currentProfile.getId());
             	Toast.makeText(LoginScreen.this, "You have been deleted from DB", Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        mAddItems = (Button) findViewById(R.id.addItemsDebugButton);
+        mAddItems.setVisibility(View.INVISIBLE);
+        mAddItems.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	Intent i = new Intent(LoginScreen.this, AddItems.class);
+                startActivityForResult(i, 1);
             }
         });
         		
@@ -264,10 +300,6 @@ public class LoginScreen extends FragmentActivity {
             profilePictureView.setProfileId(currentProfile.getId());
             greeting.setText(getString(R.string.hello_user, currentProfile.getFirstName()));
             
-            // Check if need to update current user
-          //  if (SessionData.getInstance().getCurrentUser() == null)
-          //  	SessionData.getInstance().setCurrentUser(new User(currentProfile));
-            
             // Check if need more info
             if (SessionData.getInstance().getCurrentUser() != null && (SessionData.getInstance().getCurrentUser().getAdress() == null ||
             		SessionData.getInstance().getCurrentUser().getAdress().isEmpty()))
@@ -277,11 +309,12 @@ public class LoginScreen extends FragmentActivity {
 	            mUserAdressLabel.setVisibility(View.VISIBLE);
 	            mUserPhone.setVisibility(View.VISIBLE);
 	            mUserPhoneLabel.setVisibility(View.VISIBLE);
-	            mSave.setVisibility(View.VISIBLE);
+	            mSubmit.setVisibility(View.VISIBLE);
             }
             else if (SessionData.getInstance().getCurrentUser() != null && UsersManagment.userAlreadySignedup(currentProfile.getId())){
             	cleanDetailsEditView();
             	mRemoveDB.setVisibility(View.VISIBLE);
+            	mAddItems.setVisibility(View.VISIBLE);
             }
         } else {
         	// Clean view
@@ -289,6 +322,7 @@ public class LoginScreen extends FragmentActivity {
             greeting.setText(null);
             cleanDetailsEditView();
             mRemoveDB.setVisibility(View.INVISIBLE);
+            mAddItems.setVisibility(View.INVISIBLE);
         }
     }
     
@@ -298,6 +332,6 @@ public class LoginScreen extends FragmentActivity {
         mUserAdressLabel.setVisibility(View.INVISIBLE);
         mUserPhone.setVisibility(View.INVISIBLE);
         mUserPhoneLabel.setVisibility(View.INVISIBLE);
-        mSave.setVisibility(View.INVISIBLE);
+        mSubmit.setVisibility(View.INVISIBLE);
     }
 }

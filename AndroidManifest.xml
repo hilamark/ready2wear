@@ -16,7 +16,7 @@
     FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
     COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
     IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -68,6 +68,25 @@
             </intent-filter>
         </receiver>
 
+        <activity
+            android:name="com.ready2wear.views.ItemViewListActivity"
+            android:label="@string/title_itemview_list" >
+        </activity>
+        <activity
+            android:name="com.ready2wear.views.ItemViewDetailActivity"
+            android:label="@string/title_itemview_detail" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.ready2wear.views.ItemViewListActivity" />
+        </activity>
+        <activity
+            android:name="com.ready2wear.views.AddItems"
+            android:label="@string/title_activity_add_items" >
+        </activity>
+        <activity
+            android:name="com.ready2wear.views.AddItemFragment"
+            android:label="@string/title_activity_add_item_fragment" >
+        </activity>
     </application>
 
 </manifest>
