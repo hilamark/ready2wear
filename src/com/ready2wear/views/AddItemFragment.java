@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 import com.example.hellofacebook.R;
 import com.ready2wear.domain.ItemSize;
-import com.ready2wear.utils.DownloadImageTask;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,23 +23,24 @@ public class AddItemFragment extends Fragment {
 
 	private Spinner mItemSizeSpinner;
 	private ArrayList<ItemSize> mItemSizeTypes;
+	private ImageView mImageView;
 	
 	@Override
 	  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 	    View view = inflater.inflate(R.layout.activity_add_item_fragment, container, false);
 	    
-	    ImageView imageView = (ImageView) view.findViewById(R.id.itemImg);
+	    mImageView = (ImageView) view.findViewById(R.id.itemImg);
 
         Bitmap mIcon11 = null;
         try {
-            InputStream in = new java.net.URL("https://dov5cor25da49.cloudfront.net/products/2604/195x300shirt_guys_01.jpg").openStream();
+            InputStream in = new java.net.URL("http://moxiereviews.com/wp-content/uploads/2011/08/ready-to-wear.jpg").openStream();
             mIcon11 = BitmapFactory.decodeStream(in);
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
             e.printStackTrace();
         }
 	    
-	    imageView.setImageBitmap(mIcon11);
+        mImageView.setImageBitmap(mIcon11);
 	    
 	    mItemSizeTypes = new ArrayList<ItemSize>();
         mItemSizeTypes.add(ItemSize.SMALL);
@@ -61,5 +61,10 @@ public class AddItemFragment extends Fragment {
         mItemSizeSpinner.setPrompt(getString(R.string.selectLabel));
 	    
 	    return view;
+	}
+	
+	public void updateView(Bitmap mIcon11){
+		mImageView.setImageBitmap(mIcon11);
+		mImageView.invalidate();
 	}
 }
