@@ -161,9 +161,9 @@ public class LoginScreen extends FragmentActivity {
             	UsersManagment.saveUser(currUser);
             	
             	// Change view
-            	//updateUI();
-            	 Intent i = new Intent(LoginScreen.this, AddItems.class);
-                 startActivityForResult(i, 1);
+            	updateUI();
+            	// Intent i = new Intent(LoginScreen.this, AddItems.class);
+               //  startActivityForResult(i, 1);
             }
         });
         

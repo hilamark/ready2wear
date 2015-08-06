@@ -34,8 +34,8 @@ public class BitmapWorkerTask extends AsyncTask<Integer, List<String>, byte[]> {
     
     @Override
     protected void onPreExecute() {
-        this.dialog.setMessage("Loading image");
-        this.dialog.show();
+    //    this.dialog.setMessage("Loading image");
+    //    this.dialog.show();
     }
 
     // Decode image in background.
@@ -63,7 +63,7 @@ public class BitmapWorkerTask extends AsyncTask<Integer, List<String>, byte[]> {
                 	if (e == null){
                 		urls.add(mfile.getUrl());
                 		
-                		dialog.dismiss();
+                	//	dialog.dismiss();
                 		activity.refreshView();
                 	}
                 }
