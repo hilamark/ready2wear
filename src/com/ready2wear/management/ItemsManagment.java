@@ -7,9 +7,9 @@ import android.graphics.Bitmap;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 import com.ready2wear.domain.Item;
-import com.ready2wear.domain.ItemCondition;
-import com.ready2wear.domain.ItemSize;
+import com.ready2wear.domain.SessionData;
 
 public class ItemsManagment {
 	
@@ -29,10 +29,10 @@ public class ItemsManagment {
 		try {
 			ParseObject itemPO = query.find().get(FIRST); 
 			Item item = new Item();
-			item.setCondition((ItemCondition) itemPO.get(CONDITION));
+			item.setCondition((String) itemPO.get(CONDITION));
 			//item.setImages((Bitmap) itemPO.get(IMAGE));
 			item.setPricePerDay((Integer) itemPO.get(PRICE_1D));
-			item.setSize((ItemSize) itemPO.get(SIZE));
+			item.setSize((String) itemPO.get(SIZE));
 			item.setOwnerID((String) itemPO.get(OWNERID));
 			item.setItemID((String) itemPO.get(ID));
 			
@@ -48,20 +48,27 @@ public class ItemsManagment {
 				query.whereEqualTo(ID, item);
 				
 				try {
-					List<ParseObject> userDataOnCloud = query.find();
+					List<ParseObject> itemDataOnCloud = query.find();
 					
 					// If no such user yet, create a new one
-					ParseObject userParse = userDataOnCloud.isEmpty() ? new ParseObject(
-							ITEMS_TABLE_NAME) : userDataOnCloud.get(FIRST);
+					final ParseObject itemParse = itemDataOnCloud.isEmpty() ? new ParseObject(
+							ITEMS_TABLE_NAME) : itemDataOnCloud.get(FIRST);
 							
 					// Update values
-					userParse.put(ID, item.getItemID());
-					userParse.put(SIZE, item.getSize().getSize());
-					userParse.put(PRICE_1D, item.getPricePerDay());
-					userParse.put(CONDITION, item.getCondition().getName());
-					userParse.put(OWNERID, item.getOwnerID());
-				//	userParse.put(IMAGES, item.getImage());
-					userParse.saveInBackground();
+					itemParse.put(ID, item.getItemID());
+					itemParse.put(SIZE, item.getSize());
+					itemParse.put(PRICE_1D, item.getPricePerDay());
+					itemParse.put(CONDITION, item.getCondition());
+					itemParse.put(OWNERID, item.getOwnerID());
+					itemParse.put(IMAGES, item.getImages());
+					itemParse.saveInBackground(new SaveCallback() {
+		                @Override
+		                public void done(ParseException e) {
+		                	if (e == null){
+		                		SessionData.getInstance().getCurrentUser().addItemID(itemParse.getObjectId());
+		                	}
+		                }
+		            });
 							
 				}
 				catch (ParseException e) {

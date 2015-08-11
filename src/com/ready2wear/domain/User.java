@@ -1,5 +1,6 @@
 package com.ready2wear.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.facebook.Profile;
@@ -9,6 +10,7 @@ import android.graphics.Bitmap;
 
 public class User {
 
+	private String parseID = "";
 	private String firstName = "";
 	private String lastName = "";
 	private String facebookId = "";
@@ -17,6 +19,7 @@ public class User {
 	private String phoneNumber = "";
 	private String email = "";
 	private List<String> itemsID;
+	private List<Item> items = new ArrayList<Item>();
 	
 	public static final String TAG = "User";
 	
@@ -43,6 +46,7 @@ public class User {
 		adress = po.getString("adress");
 		phoneNumber = po.getString("phoneNumber");
 		email = po.getString("email");
+		parseID = po.getObjectId();
 	}
 
 	public User(Profile currentProfile) {
@@ -107,16 +111,54 @@ public class User {
 		this.email = email;
 	}
 
-	public List<String> getItems() {
+	public List<String> getItemsID() {
 		return itemsID;
 	}
 
-	public void setItems(List<String> items) {
+	public void setItemsIDs(List<String> items) {
 		this.itemsID = items;
 	}
 	
-	public void addItem(String item){
+	public void addItemID(String item){
 		this.itemsID.add(item);
+		
+		// Update in DB as well!
+	}
+
+	public String getParseID() {
+		return parseID;
+	}
+
+	public void setParseID(String parseID) {
+		this.parseID = parseID;
 	}
 	
+	public void removeItem(int itemId){
+		// Remove item
+		this.items.remove(itemId);
+		
+		// TODO Remove item id from ids list
+		
+		// TODO Update DB on change
+	}
+
+	public List<Item> getItems() {
+		return items;
+	}
+
+	public void setItems(List<Item> items) {
+		this.items = items;
+	}
+	
+	public void addItem(Item item){
+		this.items.add(item);
+	}
+	
+	public Item getItem(int index){
+		// Sanity
+		if (index < 0 || index > this.items.size())
+			return null;
+		
+		return this.items.get(index);
+	}
 }

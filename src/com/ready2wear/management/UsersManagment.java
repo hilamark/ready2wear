@@ -5,6 +5,8 @@ import java.util.List;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
+import com.ready2wear.domain.SessionData;
 import com.ready2wear.domain.User;
 
 public class UsersManagment {
@@ -49,6 +51,9 @@ public class UsersManagment {
 	}
 	
 	public static void saveUser(User user){
+		// Update curr user
+		final User currUser = user;
+		
 		// Search user in DB
 		ParseQuery<ParseObject> query = ParseQuery.getQuery(USERS_TABLE_NAME);
 		query.whereEqualTo(ID, user.getFacebookId());
@@ -57,7 +62,7 @@ public class UsersManagment {
 			List<ParseObject> userDataOnCloud = query.find();
 			
 			// If no such user yet, create a new one
-			ParseObject userParse = userDataOnCloud.isEmpty() ? new ParseObject(
+			final ParseObject userParse = userDataOnCloud.isEmpty() ? new ParseObject(
 					USERS_TABLE_NAME) : userDataOnCloud.get(FIRST);
 					
 			// Update values
@@ -67,7 +72,14 @@ public class UsersManagment {
 			userParse.put(ADRESS, user.getAdress());
 			userParse.put(PHONE, user.getPhoneNumber());
 			userParse.put(EMAIL, user.getEmail());
-			userParse.saveInBackground();
+			userParse.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                	if (e == null){
+                		currUser.setParseID(userParse.getObjectId());
+                	}
+                }
+            });
 					
 		}
 		catch (ParseException e) {

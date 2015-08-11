@@ -15,6 +15,9 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
+import com.ready2wear.domain.Item;
+import com.ready2wear.domain.SessionData;
+import com.ready2wear.management.ItemsManagment;
 import com.ready2wear.utils.BitmapWorkerTask;
 import com.ready2wear.utils.DownloadImageTask;
 
@@ -30,15 +33,18 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
 public class AddItems extends FragmentActivity {
 	
@@ -57,12 +63,31 @@ public class AddItems extends FragmentActivity {
 	private CustomBitmapList mAdapter;
 	private AddItemFragment mFragment;
 	private Bitmap mLastAddedBitmap;
+	private List<Bitmap> bitmaps = new ArrayList<Bitmap>();
+	
+	private DrawerList myDrawers;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_items);
 		
+		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+		/*
+		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
+	        
+        myDrawers = new DrawerList(getResources(), mDrawerLayout, mDrawerList, AddItems.this, getFragmentManager(), 
+        		false, this, getActionBar());
+        */
+		myDrawers = new DrawerList(getActionBar());
+		myDrawers.updateBaR();
+		
+     // enable ActionBar app icon to behave as action to toggle nav drawer
+        getActionBar().setDisplayShowTitleEnabled(false);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+        
 		mFragment = (AddItemFragment)getSupportFragmentManager().findFragmentById(R.id.addItem_edit);
 		mCancel = (Button) findViewById(R.id.itemCancelButton);
 		mCancel.setOnClickListener(new View.OnClickListener() {
@@ -70,12 +95,7 @@ public class AddItems extends FragmentActivity {
                 onCancelButtonClicked();
             }
         });
-		mDone = (Button) findViewById(R.id.itemDoneButton);
-		mDone.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                onCancelButtonClicked();
-            }
-        });
+
 		mGridView = (GridView) findViewById(R.id.addItems);
 		myItemsBitmap.add(BitmapFactory.decodeResource(getResources(), R.drawable.plus_sign));
 		//myItemsUrl.add("https://dov5cor25da49.cloudfront.net/products/2604/195x300shirt_guys_01.jpg");
@@ -166,6 +186,7 @@ public class AddItems extends FragmentActivity {
         
         if (requestCode == CAMERA_REQUEST) {
         	mLastAddedBitmap = (Bitmap) data.getExtras().get("data");
+        	bitmaps.add(mLastAddedBitmap);
         	ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         //	mLastAddedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
         	File destination = new File(Environment.getExternalStorageDirectory(),
@@ -193,6 +214,7 @@ public class AddItems extends FragmentActivity {
         		// Translate to bitmap
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), itemPicUri);
                 mLastAddedBitmap = Bitmap.createScaledBitmap(bitmap, 120, 120, false);
+                bitmaps.add(Bitmap.createScaledBitmap(bitmap, 750, 900, false));
                 
                 // Update image in fragment
               //  mFragment = (AddItemFragment)getSupportFragmentManager().findFragmentById(R.id.addItem_edit);
@@ -210,6 +232,22 @@ public class AddItems extends FragmentActivity {
         refreshView();
         mFragment.updateVisibility();
     }
+	
+	public void saveItem(Item newItem){
+		// Add images to item
+		newItem.setImages(bitmaps);
+		
+		// Add item to user
+		SessionData.getInstance().getCurrentUser().addItem(newItem);
+		
+		// Save item to parse
+		//ItemsManagment.saveItem(newItem);
+		
+		// Done
+		Log.v(TAG, "items saved");
+        setResult(RESULT_OK, null);
+        finish();
+	}
 
 	
 	public class CustomList extends ArrayAdapter<String>{
@@ -227,7 +265,7 @@ public class AddItems extends FragmentActivity {
 		      
 		      if (view == null) {
 		         imageView = new ImageView(mContext);
-		         imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
+		         imageView.setLayoutParams(new GridView.LayoutParams(95, 95));
 		         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 		         imageView.setPadding(8, 8, 8, 8);
 		      } 

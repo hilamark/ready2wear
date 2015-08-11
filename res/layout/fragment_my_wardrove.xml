@@ -1,0 +1,104 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:facebook="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#FFF"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+            
+        
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/fbLoginButon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            facebook:com_facebook_confirm_logout="false"
+            facebook:com_facebook_tooltip_mode="never_display" />
+        
+        
+            <TextView
+                    android:id="@+id/greeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_gravity="center"
+                    android:textColor="#333"
+                    android:textSize="18sp"/>
+
+            <TableRow
+                android:id="@+id/tableRow1"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content" >
+
+                <com.facebook.login.widget.ProfilePictureView
+                    android:id="@+id/profilePicture"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_horizontal"
+                    facebook:com_facebook_preset_size="normal" >
+                </com.facebook.login.widget.ProfilePictureView>
+                
+                <LinearLayout
+                    android:layout_width="10dp"
+                    android:layout_height="wrap_content" />
+
+                <TableRow
+                    android:id="@+id/tableRow2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
+
+                    <LinearLayout
+                 		android:layout_width="wrap_content"
+                 		android:layout_height="wrap_content"
+                 		android:orientation="vertical" >
+                    		<TextView
+		                        android:id="@+id/addressTextView"
+		                        android:layout_width="fill_parent"
+		                        android:layout_height="fill_parent" />
+
+		                    <TextView
+		                        android:id="@+id/phoneTextView"
+		                        android:layout_width="fill_parent"
+		                        android:layout_height="fill_parent" />
+					</LinearLayout>
+                </TableRow>
+
+            </TableRow>
+
+            <Button
+                android:id="@+id/listAnItem_button"
+                android:layout_width="199dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:lines="1"
+                android:text="List an item!" />
+
+           </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <GridView
+        android:id="@+id/myItemsGrid"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_weight="1.00"
+        android:background="#fff"
+        android:columnWidth="200dp"
+        android:fadingEdge="horizontal"
+        android:horizontalSpacing="10dp"   
+        android:verticalSpacing="10dp"
+        android:numColumns="2" />
+
+</LinearLayout>

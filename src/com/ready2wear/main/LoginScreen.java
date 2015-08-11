@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Address;
@@ -32,9 +33,11 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,7 +54,7 @@ import com.ready2wear.domain.SessionData;
 import com.ready2wear.domain.User;
 import com.ready2wear.management.UsersManagment;
 import com.ready2wear.views.AddItems;
-import com.ready2wear.views.ItemViewListActivity;
+import com.ready2wear.views.MainLogged;
 
 public class LoginScreen extends FragmentActivity {
 
@@ -71,24 +74,22 @@ public class LoginScreen extends FragmentActivity {
     private Button mRemoveDB;
     private Button mAddItems;
     
-    private Profile currentProfile;
-    
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	getActionBar().setDisplayShowTitleEnabled(false);
         super.onCreate(savedInstanceState);
+        
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
         
         // Enable Local Datastore.
         Parse.enableLocalDatastore(this);       
         Parse.initialize(this, "fcadvUu586ZSR6Whu9Ah9NZ2ugR5PMbTzTMUnd4v", "Yv9iCTGvjEIOjIZopg2myTG0tqPy9etArssH3CH6");
-
-        FacebookSdk.sdkInitialize(this.getApplicationContext());
 
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-                       // updateUser(loginResult);
                         updateUI();
                     }
 
@@ -161,9 +162,7 @@ public class LoginScreen extends FragmentActivity {
             	UsersManagment.saveUser(currUser);
             	
             	// Change view
-            	updateUI();
-            	// Intent i = new Intent(LoginScreen.this, AddItems.class);
-               //  startActivityForResult(i, 1);
+            	startMainAct();
             }
         });
         
@@ -174,7 +173,7 @@ public class LoginScreen extends FragmentActivity {
             public void onClick(View v) {
             	Log.d(TAG, "Remove user button pressed");
             	
-            	UsersManagment.removeUser(currentProfile.getId());
+            	UsersManagment.removeUser(SessionData.getInstance().getCurrentProfile().getId());
             	Toast.makeText(LoginScreen.this, "You have been deleted from DB", Toast.LENGTH_SHORT).show();
             }
         });
@@ -183,7 +182,8 @@ public class LoginScreen extends FragmentActivity {
         mAddItems.setVisibility(View.INVISIBLE);
         mAddItems.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	Intent i = new Intent(LoginScreen.this, AddItems.class);
+            //	Intent i = new Intent(LoginScreen.this, AddItems.class);
+            	Intent i = new Intent(LoginScreen.this, MainLogged.class);
                 startActivityForResult(i, 1);
             }
         });
@@ -240,21 +240,22 @@ public class LoginScreen extends FragmentActivity {
     }
     
     private void updateUser(LoginResult loginResult) {
-    	currentProfile = Profile.getCurrentProfile();
+    	SessionData.getInstance().setCurrentProfile(Profile.getCurrentProfile());
     	
     	// Sanity check
-    	if (currentProfile == null)
+    	if (SessionData.getInstance().getCurrentProfile() == null)
     		return;
     	
     	// Init
     	User currentUser = null;
     	
     	// Check if user logged out
-    	if (currentProfile.getId() == null || currentProfile.getId().isEmpty())
+    	if (SessionData.getInstance().getCurrentProfile().getId() == null || 
+    			SessionData.getInstance().getCurrentProfile().getId().isEmpty())
     		currentUser = new User();
     	else
     		// Try getting user from DB
-    		currentUser = UsersManagment.getUser(currentProfile.getId());
+    		currentUser = UsersManagment.getUser(SessionData.getInstance().getCurrentProfile().getId());
     	
     	// Check if need to fetch data
     	if (currentUser == null){
@@ -277,7 +278,7 @@ public class LoginScreen extends FragmentActivity {
 	        request.executeAsync();
 	        */
 	    	// Update current user
-	    	currentUser = new User(currentProfile);
+	    	currentUser = new User(SessionData.getInstance().getCurrentProfile());
 	    /*	try {
 				currentUser.setEmail(request.getGraphObject().getString("email"));
 			} catch (JSONException e) {
@@ -293,14 +294,14 @@ public class LoginScreen extends FragmentActivity {
         boolean enableButtons = AccessToken.
         		getCurrentAccessToken() != null;
 
-        currentProfile = Profile.getCurrentProfile();
-        if (enableButtons && currentProfile != null) {
+        SessionData.getInstance().setCurrentProfile(Profile.getCurrentProfile());
+        if (enableButtons && SessionData.getInstance().getCurrentProfile() != null) {
         	
         	// Enable more data on view
-            profilePictureView.setProfileId(currentProfile.getId());
-            greeting.setText(getString(R.string.hello_user, currentProfile.getFirstName()));
-            
-            // Check if need more info
+        	profilePictureView.setProfileId(SessionData.getInstance().getCurrentProfile().getId());
+        	greeting.setText(getString(R.string.hello_user, SessionData.getInstance().getCurrentProfile().getFirstName()));
+        	
+        	// Check if need more info
             if (SessionData.getInstance().getCurrentUser() != null && (SessionData.getInstance().getCurrentUser().getAdress() == null ||
             		SessionData.getInstance().getCurrentUser().getAdress().isEmpty()))
             {
@@ -311,10 +312,10 @@ public class LoginScreen extends FragmentActivity {
 	            mUserPhoneLabel.setVisibility(View.VISIBLE);
 	            mSubmit.setVisibility(View.VISIBLE);
             }
-            else if (SessionData.getInstance().getCurrentUser() != null && UsersManagment.userAlreadySignedup(currentProfile.getId())){
-            	cleanDetailsEditView();
-            	mRemoveDB.setVisibility(View.VISIBLE);
-            	mAddItems.setVisibility(View.VISIBLE);
+            // We have fb user with all data filled, move on to next screen
+            else if (SessionData.getInstance().getCurrentUser() != null && 
+            		UsersManagment.userAlreadySignedup(SessionData.getInstance().getCurrentProfile().getId())){
+            	startMainAct();
             }
         } else {
         	// Clean view
@@ -333,5 +334,10 @@ public class LoginScreen extends FragmentActivity {
         mUserPhone.setVisibility(View.INVISIBLE);
         mUserPhoneLabel.setVisibility(View.INVISIBLE);
         mSubmit.setVisibility(View.INVISIBLE);
+    }
+    
+    private void startMainAct(){
+    	Intent i = new Intent(LoginScreen.this, MainLogged.class);
+        startActivityForResult(i, 1);
     }
 }
